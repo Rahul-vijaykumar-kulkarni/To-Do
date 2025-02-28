@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Table(name = "user")
@@ -32,10 +33,13 @@ public class User implements UserDetails {
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
-
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Task> tasks = new ArrayList<>();
+
+    // Getters and Setters
     public Integer getId() {
         return id;
     }
@@ -115,5 +119,20 @@ public class User implements UserDetails {
 
     public void setTokens(List<Token> tokens) {
         this.tokens = tokens;
+    }
+
+    // Methods to manage tasks
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
+    public void addTask(Task task) {
+        tasks.add(task);
+        task.setUser(this);
+    }
+
+    public void removeTask(Task task) {
+        tasks.remove(task);
+        task.setUser(null);
     }
 }

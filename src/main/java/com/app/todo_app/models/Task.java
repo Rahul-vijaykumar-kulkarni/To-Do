@@ -1,9 +1,6 @@
 package com.app.todo_app.models;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -15,5 +12,12 @@ public class Task {
     private String title;
     private boolean comp;
 
+    @ManyToOne(fetch = FetchType.LAZY)  // Many tasks can belong to one user
+    @JoinColumn(name = "user_id")       // Foreign key column in the task table
+    private User user;
 
+    // Add this method to set the user for the task
+    public void setUser(User user) {
+        this.user = user;
+    }
 }

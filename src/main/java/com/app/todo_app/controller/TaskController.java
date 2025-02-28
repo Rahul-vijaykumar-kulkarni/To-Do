@@ -18,14 +18,14 @@ public class TaskController {
     }
 @GetMapping
     public String getTask(Model model){
-        List<Task> tasks = taskService.getAlltask();
+        List<Task> tasks = taskService.getAllTasksForCurrentUser();
         model.addAttribute("tasks",tasks);
         return "tasks";
     }
 
     @PostMapping
-    public String CreateTask(@RequestParam String title ){
-        taskService. CreateTask(title);
+    public String createTask(@RequestParam String title ){
+        taskService. createTask(title);
 
         return "redirect:/home";
     }
