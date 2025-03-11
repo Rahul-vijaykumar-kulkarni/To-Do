@@ -1,0 +1,46 @@
+<ul class="list-group">
+  <li *ngFor="let todo of todos" class="list-group-item d-flex align-items-center"
+      [class.list-group-item-success]="todo.comp">
+    
+    <div class="form-check me-3">
+      <input 
+        class="form-check-input" 
+        type="checkbox" 
+        [id]="'check-' + todo.id"
+        [checked]="todo.comp" 
+        (change)="toggleComplete(todo)"
+        style="width: 1.2rem; height: 1.2rem;">
+    </div>
+    
+    <!-- Display mode -->
+    <ng-container *ngIf="editingTodo?.id !== todo.id; else editTemplate">
+      <div class="flex-grow-1">
+        <label class="form-check-label me-3" [for]="'check-' + todo.id"
+               [class.text-decoration-line-through]="todo.comp"
+               [class.text-muted]="todo.comp">
+          {{ todo.title }}
+        </label>
+        <span class="text-muted ms-2">
+          Due: {{ todo.dueDate ? (todo.dueDate | date:'mediumDate') : 'No due date' }}
+        </span>
+      </div>
+      <button class="btn btn-secondary btn-sm me-2" (click)="editTodo(todo)">Edit</button>
+    </ng-container>
+    
+    <!-- Edit mode -->
+    <ng-template #editTemplate>
+      <input type="text" [(ngModel)]="editingTodo!.title" class="form-control flex-grow-1 me-2" placeholder="Edit title">
+      <input type="date" [(ngModel)]="editingTodo!.dueDate" class="form-control flex-grow-1 me-2" placeholder="Due Date">
+      <button class="btn btn-success btn-sm me-2" (click)="updateTodo()">Save</button>
+      <button class="btn btn-warning btn-sm me-2" (click)="cancelEdit()">Cancel</button>
+    </ng-template>
+    
+    <button class="btn btn-danger btn-sm" (click)="deleteTodo(todo.id)">
+      <i class="bi bi-trash"></i>
+    </button>
+  </li>
+</ul>
+
+<div *ngIf="todos.length === 0" class="text-center text-muted mt-4">
+  No todos found. Add your first todo!
+</div>

@@ -1,0 +1,71 @@
+<div class="register-container">
+  <h2>Register</h2>
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <!-- First Name -->
+    <div class="form-group">
+      <label for="firstName">First Name</label>
+      <input id="firstName" formControlName="firstName" type="text" placeholder="Enter first name">
+      <div *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched" class="error-message">
+        <small *ngIf="registerForm.get('firstName')?.errors?.['required']">
+          First name is required.
+        </small>
+      </div>
+    </div>
+
+    <!-- Last Name -->
+    <div class="form-group">
+      <label for="lastName">Last Name</label>
+      <input id="lastName" formControlName="lastName" type="text" placeholder="Enter last name">
+      <div *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched" class="error-message">
+        <small *ngIf="registerForm.get('lastName')?.errors?.['required']">
+          Last name is required.
+        </small>
+      </div>
+    </div>
+
+    <!-- Username -->
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input id="username" formControlName="username" type="text" placeholder="Choose a username">
+      <div *ngIf="registerForm.get('username')?.invalid && registerForm.get('username')?.touched" class="error-message">
+        <small *ngIf="registerForm.get('username')?.errors?.['required']">
+          Username is required.
+        </small>
+        <small *ngIf="registerForm.get('username')?.errors?.['maxlength']">
+          Username must be at most 20 characters.
+        </small>
+        <small *ngIf="registerForm.get('username')?.errors?.['weakUsername']">
+          Username must include at least one uppercase letter, one symbol, and one number.
+        </small>
+      </div>
+    </div>
+
+    <!-- Password -->
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input id="password" formControlName="password" type="password" placeholder="Create a password">
+      <div *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched" class="error-message">
+        <small *ngIf="registerForm.get('password')?.errors?.['required']">
+          Password is required.
+        </small>
+        <small *ngIf="registerForm.get('password')?.errors?.['weakPassword']">
+          Password must include at least one uppercase letter, one symbol, and one number.
+        </small>
+      </div>
+    </div>
+
+    <button type="submit" class="btn" [disabled]="registerForm.invalid">
+      Register
+    </button>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="success-message">
+      {{ successMessage }}
+    </div>
+  </form>
+  <div class="mt-3 text-center">
+    <a href="/login" class="text-decoration-none">Already have an account? Login here</a>
+  </div>
+</div>

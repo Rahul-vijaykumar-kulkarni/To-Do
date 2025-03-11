@@ -1,0 +1,29 @@
+<!-- todo-form.component.html -->
+<div class="mb-4">
+    <div class="input-group">
+      <input 
+        type="text" 
+        class="form-control form-control-lg" 
+        placeholder="Add new todo..."
+        [(ngModel)]="newTodo"
+        (keyup.enter)="addTodo()"
+      >
+       <!-- Input for Due Date -->
+  <div class="input-group mb-2">
+    <input 
+      type="date" 
+      class="form-control form-control-lg"
+      placeholder="Select due date"
+      [(ngModel)]="newDueDate"
+      (keyup.enter)="addTodo()"
+    >
+  </div>
+      <button 
+        class="btn btn-primary btn-lg" 
+        type="button"
+        (click)="addTodo()"
+      >
+        <i class="bi bi-plus-circle"></i> Add Todo
+      </button>
+    </div>
+  </div>
