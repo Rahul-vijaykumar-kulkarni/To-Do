@@ -1,5 +1,7 @@
 package com.app.todo_app.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,9 +36,11 @@ public class User implements UserDetails {
     private Role role;
 
     @OneToMany(mappedBy = "user")
+//    @JsonManagedReference
     private List<Token> tokens;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // Add this to break the circular reference
     private List<Task> tasks = new ArrayList<>();
 
     // Getters and Setters

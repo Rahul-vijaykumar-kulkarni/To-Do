@@ -1,8 +1,5 @@
 package com.app.todo_app.config;
 
-
-
-
 import com.app.todo_app.filter.JwtAuthenticationFilter;
 import com.app.todo_app.services.UserDetailsServiceImp;
 import org.springframework.context.annotation.Bean;
@@ -14,22 +11,23 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     private final UserDetailsServiceImp userDetailsServiceImp;
-
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-
     private final CustomLogoutHandler logoutHandler;
 
     public SecurityConfig(UserDetailsServiceImp userDetailsServiceImp,
@@ -43,23 +41,45 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for simplicity
+                .csrf(AbstractHttpConfigurer::disable) // CSRF disabled for stateless JWT
+                .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Add CORS configuration
                 .authorizeHttpRequests(req -> req
-                        .requestMatchers("/", "/login", "/register", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/**", "/home", "/home/**",
+                                "/api/auth/login", "/api/auth/register","/login","/register", // API endpoints
+                                "/css/**", "/js/**", "/images/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin(form -> form
-                        .loginPage("/login") // Custom login page
-                        .loginProcessingUrl("/login") // Process POST to /login
-                        .defaultSuccessUrl("/home", true) // Redirect after success
-                        .failureUrl("/login?error=true") // Redirect on failure
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS) // No sessions for JWT
                 )
                 .logout(logout -> logout
-                        .logoutSuccessUrl("/login?logout=true")
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            response.setStatus(HttpStatus.OK.value());
+                        })
                         .permitAll()
                 )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
+
+    // CORS configuration (adjust origins as needed)
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200")); // Frontend origin  //check
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization")); //check
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -69,6 +89,4 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
-
-
 }

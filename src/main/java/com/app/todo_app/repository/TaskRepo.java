@@ -9,5 +9,6 @@ import java.util.Optional;
 
 public interface TaskRepo extends JpaRepository<Task, Long> {
     List<Task> findByUser(User user);
-    Optional<Task> findByIdAndUser(Long id, User user);
+    Optional<Task> findByIdAndUser(Long id, User user); // For fetching a single task
+
 }

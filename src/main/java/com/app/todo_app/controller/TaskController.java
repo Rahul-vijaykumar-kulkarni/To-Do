@@ -2,13 +2,14 @@ package com.app.todo_app.controller;
 
 import com.app.todo_app.models.Task;
 import com.app.todo_app.services.TaskService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+@CrossOrigin(origins = "http://localhost:4200")
+@RestController // Use RestController instead of Controller
 @RequestMapping("/home")
-@Controller
 public class TaskController {
 
     private final TaskService taskService;
@@ -16,28 +17,33 @@ public class TaskController {
     public TaskController(TaskService taskService) {
         this.taskService = taskService;
     }
-@GetMapping
-    public String getTask(Model model){
-        List<Task> tasks = taskService.getAllTasksForCurrentUser();
-        model.addAttribute("tasks",tasks);
-        return "tasks";
+
+    @GetMapping
+    public ResponseEntity<List<Task>> getTask() {
+        return ResponseEntity.ok(taskService.getAllTasksForCurrentUser());
     }
 
     @PostMapping
-    public String createTask(@RequestParam String title ){
-        taskService. createTask(title);
+    public ResponseEntity<String> createTask(@RequestBody Task task) { // Use RequestBody
+        taskService.createTask(task.getTitle(), task.getDueDate()); //
+        return ResponseEntity.ok("Task created successfully");
+    }
 
-        return "redirect:/home";
+    @DeleteMapping("/{id}") // Use proper HTTP method
+    public ResponseEntity<String> deleteTask(@PathVariable long id) {
+        taskService.deleteTask(id);
+        return ResponseEntity.ok("Task deleted successfully");
     }
-    @GetMapping("/{id}/delete")
-    public String deleteTask(@PathVariable long id){
-       taskService.deleteTask(id);
-        return "redirect:/home";
-    }
-    @GetMapping("/{id}/toggle")
-    public String toggleTask(@PathVariable long id){
+
+    @PutMapping("/{id}/toggle") // Use proper HTTP method
+    public ResponseEntity<String> toggleTask(@PathVariable long id) {
         taskService.toggleTask(id);
-        return "redirect:/home";
+        return ResponseEntity.ok("Task toggled successfully");
+    }
+    //update task
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateTask(@PathVariable long id, @RequestBody Task task) {
+        taskService.updateTask(id, task.getTitle());
+        return ResponseEntity.ok("Task updated successfully");
     }
 }
-

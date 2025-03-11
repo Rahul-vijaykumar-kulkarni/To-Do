@@ -3,6 +3,8 @@ package com.app.todo_app.models;
 
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -25,6 +27,8 @@ public class Token {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+//    @JsonBackReference
+//    @JsonIgnore
     private User user;
 
     public Integer getId() {
